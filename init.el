@@ -21,11 +21,12 @@
 (blink-cursor-mode 0) ; no cursor blinking
 
 ;; font
-(set-face-attribute 'default nil :font "DejaVu Sans Mono-14")
+(set-face-attribute 'default nil :font "DejaVu Sans Mono-13")
 
 ;; packages
 (require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/"))) ; archives
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			 ("gnu" . "https://elpa.gnu.org/packages/"))) ; archives
 
 (package-initialize)
 (unless package-archive-contents ; refresh packages
@@ -56,7 +57,8 @@
          :map ivy-minibuffer-map
          ("TAB" . ivy-alt-done))
   :config
-  (ivy-mode 1))
+  (ivy-mode 1)
+  (setq ivy-initial-inputs-alist nil)) ; removes '^' from ivy input list
 
 (use-package ivy-rich
   :after ivy
@@ -64,7 +66,7 @@
   (ivy-rich-mode 1))
 
 (use-package counsel
-  :bind (("C-M-j" . 'counsel-switch-buffer) ; TODO: set switching buffer to something else
+  :bind (("C-M-j" . 'counsel-switch-buffer) ; TODO: set switching buffer to something
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history))
   :custom
@@ -83,17 +85,24 @@
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode))
+
 (use-package evil
   :init
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   (setq evil-want-C-u-scroll t)
   (setq evil-want-C-i-jump nil)
-  (setq evil-want-fine-undo t)
+  (setq evil-want-fine-undo t) ; make REPLACE one undo operation
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  :bind (:map evil-normal-state-map
+	      ("u" . 'undo-tree-undo)
+	      ("C-r" . 'undo-tree-redo)))
 
-(defun evil-center-line (&rest _) ; make evil center line on line move e.g. nnoremap j jzz)
+(defun evil-center-line (&rest _) ; make evil center line on line move e.g. nnoremap j jzz
   (evil-scroll-line-to-center nil))
 (advice-add 'evil-line-move :after #'evil-center-line)
 (advice-add 'evil-search-next :after #'evil-center-line)
@@ -101,9 +110,71 @@
 (advice-add 'evil-search-forward :after #'evil-center-line)
 (advice-add 'evil-search-backward :after #'evil-center-line)
 
-;; Keybindings
+;; keybindings
+;; global
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; make <escape> quit prompts
+;; window
+(windmove-default-keybindings)
+(evil-define-key 'normal 'global (kbd "C-l") 'windmove-right)
+(evil-define-key 'normal 'global (kbd "C-h") 'windmove-left)
+(evil-define-key 'normal 'global (kbd "C-k") 'windmove-up)
+(evil-define-key 'normal 'global (kbd "C-j") 'windmove-down)
+(evil-define-key 'normal 'global (kbd "C-w") 'kill-buffer-and-window)
+(evil-define-key 'normal 'global (kbd "C-S-k") 'enlarge-window)
+(evil-define-key 'normal 'global (kbd "C-S-l") 'shrink-window)
+(evil-define-key 'normal 'global (kbd "C-S-h") 'shrink-window-horizontally)
+(evil-define-key 'normal 'global (kbd "C-S-k") 'shrink-window-horizontally)
+(evil-define-key 'normal 'global (kbd "C-S-w") 'delete-other-windows)
+(evil-define-key 'normal 'global (kbd "SPC wb") 'balance-windows)
+(evil-define-key 'normal 'global (kbd "SPC wss") 'split-window-right)
+(evil-define-key 'normal 'global (kbd "SPC wsv") 'split-window-right)
+(evil-define-key 'normal 'global (kbd "SPC wsh") 'split-window-below)
+;; help bindings
+(evil-define-key 'normal 'global (kbd "SPC ha") 'counsel-apropos)
+(evil-define-key 'normal 'global (kbd "SPC hk") 'helpful-key)
+(evil-define-key 'normal 'global (kbd "SPC hn") 'view-emacs-news)
+(evil-define-key 'normal 'global (kbd "SPC hv") 'helpful-variable)
+(evil-define-key 'normal 'global (kbd "SPC hp") 'finder-by-keyword)
+(evil-define-key 'normal 'global (kbd "SPC hP") 'describe-package)
+(evil-define-key 'normal 'global (kbd "SPC hf") 'counsel-describe-function)
+;; file navigation
+(evil-define-key 'normal 'global (kbd "SPC fr") 'counsel-recentf)
+(evil-define-key 'normal 'global (kbd "SPC ff") 'find-file)
+(evil-define-key 'normal 'global (kbd "SPC fj") 'counsel-file-jump)
+;; buffer navigation
+(evil-define-key 'normal 'global (kbd "SPC bb") 'switch-to-buffer)
+(evil-define-key 'normal 'global (kbd "SPC bk") 'kill-buffer)
+(evil-define-key 'normal 'global (kbd "SPC bl") 'ibuffer)
+(evil-define-key 'normal 'global (kbd "C-n") 'previous-buffer)
+(evil-define-key 'normal 'global (kbd "C-m") 'next-buffer)
+;; theme
+(evil-define-key 'normal 'global (kbd "SPC tt") 'counsel-load-theme)
 
 ;; editor settings
 (column-number-mode)
 (global-display-line-numbers-mode t) ; turn on line numbers
+(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-width-start 4)
+(setq display-line-numbers-grow-only t)
+(setq-default indicate-empty-lines t) ; indicates empty lines at end of buffer
+
+;; erc custom connection to libera
+(defun erc-connect-to-libera ()
+  (interactive)
+  (setq passwd (read-passwd "Password: "))
+  (erc-tls :server "irc.libera.chat" :port 6697 :nick "akiosakuro" :password passwd))
+
+;; CUSTOM EDITOR CHANGES
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(undo-tree evil helpful counsel ivy-rich ivy which-key rainbow-delimiters material-theme use-package)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
