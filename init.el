@@ -102,6 +102,11 @@
 	      ("u" . 'undo-tree-undo)
 	      ("C-r" . 'undo-tree-redo)))
 
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :custom ((dired-listing-switches "-lavh")))
+
 (defun evil-center-line (&rest _) ; make evil center line on line move e.g. nnoremap j jzz
   (evil-scroll-line-to-center nil))
 (advice-add 'evil-line-move :after #'evil-center-line)
@@ -119,7 +124,7 @@
 (evil-define-key 'normal 'global (kbd "C-h") 'windmove-left)
 (evil-define-key 'normal 'global (kbd "C-k") 'windmove-up)
 (evil-define-key 'normal 'global (kbd "C-j") 'windmove-down)
-(evil-define-key 'normal 'global (kbd "C-w") 'kill-buffer-and-window)
+(evil-define-key 'normal 'global (kbd "C-w") 'delete-window)
 (evil-define-key 'normal 'global (kbd "C-S-k") 'enlarge-window)
 (evil-define-key 'normal 'global (kbd "C-S-l") 'shrink-window)
 (evil-define-key 'normal 'global (kbd "C-S-h") 'shrink-window-horizontally)
@@ -141,6 +146,7 @@
 (evil-define-key 'normal 'global (kbd "SPC fr") 'counsel-recentf)
 (evil-define-key 'normal 'global (kbd "SPC ff") 'find-file)
 (evil-define-key 'normal 'global (kbd "SPC fj") 'counsel-file-jump)
+(evil-define-key 'normal 'global (kbd "SPC fs") 'dired-jump)
 ;; buffer navigation
 (evil-define-key 'normal 'global (kbd "SPC bb") 'switch-to-buffer)
 (evil-define-key 'normal 'global (kbd "SPC bk") 'kill-buffer)
@@ -149,6 +155,11 @@
 (evil-define-key 'normal 'global (kbd "C-m") 'next-buffer)
 ;; theme
 (evil-define-key 'normal 'global (kbd "SPC tt") 'counsel-load-theme)
+;; elisp evaluation
+(evil-define-key 'normal 'global (kbd "SPC e") 'eval-last-sexp)
+(evil-define-key 'normal 'global (kbd "SPC x") 'counsel-M-x)
+;; save
+(evil-define-key 'normal 'global (kbd "SPC s") 'save-buffer)
 
 ;; editor settings
 (column-number-mode)
