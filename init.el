@@ -21,7 +21,7 @@
 (blink-cursor-mode 0) ; no cursor blinking
 
 ;; font
-(set-face-attribute 'default nil :font "DejaVu Sans Mono-13")
+(set-face-attribute 'default nil :font "SauceCodePro Nerd Font Mono-13")
 
 ;; packages
 (require 'package)
@@ -114,6 +114,7 @@
 (advice-add 'evil-search-previous :after #'evil-center-line)
 (advice-add 'evil-search-forward :after #'evil-center-line)
 (advice-add 'evil-search-backward :after #'evil-center-line)
+(advice-add 'evil-goto-line :after #'evil-center-line)
 
 ;; keybindings
 ;; global
@@ -162,7 +163,7 @@
 (evil-define-key 'normal 'global (kbd "SPC s") 'save-buffer)
 
 ;; editor settings
-(column-number-mode)
+(column-number-mode t)
 (global-display-line-numbers-mode t) ; turn on line numbers
 (setq display-line-numbers-type 'relative)
 (setq display-line-numbers-width-start 4)
