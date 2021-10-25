@@ -12,13 +12,19 @@
 (tooltip-mode -1)    ; disable tooltips
 (menu-bar-mode -1)   ; disable menu-bar
 
-(set-fringe-mode 30) ; window padding left
 (global-hl-line-mode 1) ; highlight cursor line
 (set-face-attribute 'hl-line nil :inherit nil :background "gray6")
 (visual-line-mode 1) ; wrap line breaks nicely on whitespace
 (show-paren-mode 1) ; matches and highlights parentheses
 (setq show-paren-delay 0)
 (blink-cursor-mode 0) ; no cursor blinking
+
+(defun my-set-margins ()
+  "Set margins in current buffer."
+  (setq left-margin-width 100)
+  (setq right-margin-width 100))
+
+(add-hook 'text-mode-hook 'my-set-margins)
 
 ;; font
 (set-face-attribute 'default nil :font "SauceCodePro Nerd Font Mono-13")
@@ -37,12 +43,12 @@
 (require 'use-package)
 (setq use-package-always-ensure t) ; make sure all packages are downloaded and installed before running them
 
-(use-package material-theme
+(use-package nano-theme
   :config
-  (load-theme 'material t))
+  (load-theme 'nano-light t))
 
 (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode)) ; rainbow layered parans in programming mode
+  :hook (prog-mode . rainbow-delimiters-mode)) ; rainbow layered parens in programming mode
 
 (use-package which-key
   :init
@@ -57,8 +63,8 @@
          :map ivy-minibuffer-map
          ("TAB" . ivy-alt-done))
   :config
-  (ivy-mode 1)
-  (setq ivy-initial-inputs-alist nil)) ; removes '^' from ivy input list
+  (ivy-mode 1))
+;  (setq ivy-initial-inputs-alist nil)) ; removes '^' from ivy input list
 
 (use-package ivy-rich
   :after ivy
@@ -88,6 +94,13 @@
 (use-package undo-tree
   :config
   (global-undo-tree-mode))
+
+;(use-package perfect-margin ; auto centers every window
+;  :custom
+;  (perfect-margin-visible-width 120)
+;  :config
+;  ;; enable perfect-mode
+;  (perfect-margin-mode t))
 
 (use-package evil
   :init
@@ -158,7 +171,7 @@
 (evil-define-key 'normal 'global (kbd "SPC tt") 'counsel-load-theme)
 ;; elisp evaluation
 (evil-define-key 'normal 'global (kbd "SPC e") 'eval-last-sexp)
-(evil-define-key 'normal 'global (kbd "SPC x") 'counsel-M-x)
+(evil-define-key 'normal 'global (kbd "SPC SPC") 'counsel-M-x)
 ;; save
 (evil-define-key 'normal 'global (kbd "SPC s") 'save-buffer)
 
@@ -174,19 +187,6 @@
 (defun erc-connect-to-libera ()
   (interactive)
   (setq passwd (read-passwd "Password: "))
+<<<<<<< HEAD
   (erc-tls :server "irc.libera.chat" :port 6697 :nick "akiosakuro" :password passwd))
 
-;; CUSTOM EDITOR CHANGES
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(undo-tree evil helpful counsel ivy-rich ivy which-key rainbow-delimiters material-theme use-package)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
